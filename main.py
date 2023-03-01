@@ -3,18 +3,20 @@ import sys
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import QTableWidgetItem, QMainWindow, QApplication
+from main_window import Ui_MainWindow as My_Form
+from editForm import Ui_MainWindow as My_EditForm
 
 
-class MyForm(QMainWindow):
+class MyForm(QMainWindow, My_Form):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
         self.update_table()
         self.btn.clicked.connect(self.edit_coffee)
         self.btn1.clicked.connect(self.add_coffee)
 
     def update_table(self):
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('data/coffee.sqlite')
         cur = con.cursor()
         results = cur.execute("select * from сорта").fetchall()
         if not results:
@@ -46,10 +48,10 @@ class MyForm(QMainWindow):
             self.window.show()
 
 
-class EditForm(QMainWindow):
+class EditForm(QMainWindow, My_EditForm):
     def __init__(self, window, *params):
         super().__init__()
-        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.setupUi(self)
         self.coffee = 0
         self.w = window
         self.edits = [self.edit1, self.edit2, self.edit3, self.edit4, self.edit5, self.edit6]
@@ -64,7 +66,7 @@ class EditForm(QMainWindow):
 
     def save_changes(self):
         vs = [i.text() for i in self.edits]
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('data/coffee.sqlite')
         cur = con.cursor()
         if not self.coffee:
             self.coffee = max([x[0] for x in cur.execute('select id from сорта').fetchall()]) + 1
@@ -95,3 +97,5 @@ if __name__ == '__main__':
     ex.show()
     sys.excepthook = except_hook
     sys.exit(app.exec_())
+
+# pip install 'pyinstaller' --user
